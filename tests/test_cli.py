@@ -68,9 +68,12 @@ class TestMissingFlags:
         )
         assert result.returncode != 0
 
-    def test_no_subcommand(self):
+    def test_no_subcommand_shows_help(self):
         result = run_strider()
-        assert result.returncode != 0
+        assert result.returncode == 0
+        assert "calculate" in result.stdout
+        assert "help-stride" in result.stdout
+        assert "help-speed" in result.stdout
 
 
 class TestDateShortcuts:

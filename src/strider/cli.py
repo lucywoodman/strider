@@ -25,7 +25,8 @@ def parse_date(value: str) -> date:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="strider",
-        description="Walking goal calculator",
+        description="Walking goal calculator — figure out daily targets to hit your step or distance goal.",
+        epilog="Run 'strider <command> --help' for more info on a command.",
     )
     subparsers = parser.add_subparsers(dest="command")
 
@@ -72,8 +73,8 @@ def main():
     args = parser.parse_args()
 
     if args.command is None:
-        parser.print_usage(sys.stderr)
-        sys.exit(2)
+        parser.print_help()
+        return
 
     if args.command == "help-stride":
         print(STRIDE_HELP)
