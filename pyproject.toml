@@ -1,0 +1,22 @@
+[project]
+name = "strider"
+version = "0.1.0"
+description = "A CLI walking goal calculator"
+readme = "README.md"
+authors = [
+    { name = "Lucy Woodman", email = "lucy.woodman@wpengine.com" }
+]
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+strider = "strider.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.13,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
