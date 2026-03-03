@@ -31,15 +31,15 @@ uv run strider calculate \
   --speed 4.5
 ```
 
-| Flag | Required | Default | Description |
-|---|---|---|---|
-| `--goal-type` | yes | | `steps` or `distance` |
-| `--goal` | yes | | Target amount |
-| `--progress` | yes | | Current progress |
-| `--target-date` | yes | | Deadline (`YYYY-MM-DD`) |
-| `--unit` | no | `km` | `km` or `miles` (distance goals) |
-| `--steps-per-km` | no | `1400` | Your stride rate |
-| `--speed` | no | `5.0` | Walking speed in km/h |
+| Flag | Short | Required | Default | Description |
+|---|---|---|---|---|
+| `--goal-type` | `-t` | yes | | `steps` or `distance` |
+| `--goal` | `-g` | yes | | Target amount |
+| `--progress` | `-p` | yes | | Current progress |
+| `--target-date` | `-d` | yes | | `YYYY-MM-DD`, `today`, or `tomorrow` |
+| `--unit` | `-u` | no | `km` | `km` or `miles` (distance goals) |
+| `--steps-per-km` | `-s` | no | `1400` | Your stride rate |
+| `--speed` | `-k` | no | `5.0` | Walking speed in km/h |
 
 ### Help guides
 
