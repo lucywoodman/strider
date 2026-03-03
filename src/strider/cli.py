@@ -31,13 +31,13 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command")
 
     calc = subparsers.add_parser("calculate", help="Calculate daily walking targets")
-    calc.add_argument("--goal-type", required=True, choices=["steps", "distance"])
-    calc.add_argument("--goal", required=True, type=float)
-    calc.add_argument("--progress", required=True, type=float)
-    calc.add_argument("--target-date", required=True, type=parse_date)
-    calc.add_argument("--steps-per-km", type=float, default=1400)
-    calc.add_argument("--speed", type=float, default=5.0)
-    calc.add_argument("--unit", choices=["km", "miles"], default="km")
+    calc.add_argument("-t", "--goal-type", choices=["steps", "distance"])
+    calc.add_argument("-g", "--goal", type=float)
+    calc.add_argument("-p", "--progress", type=float)
+    calc.add_argument("-d", "--target-date", type=parse_date)
+    calc.add_argument("-s", "--steps-per-km", type=float, default=1400)
+    calc.add_argument("-k", "--speed", type=float, default=5.0)
+    calc.add_argument("-u", "--unit", choices=["km", "miles"], default="km")
 
     subparsers.add_parser("help-stride", help="How to estimate steps per km")
     subparsers.add_parser("help-speed", help="How to estimate walking speed")
@@ -83,6 +83,15 @@ def main():
     if args.command == "help-speed":
         print(SPEED_HELP)
         return
+
+    required = {"goal_type": "--goal-type/-t", "goal": "--goal/-g",
+                "progress": "--progress/-p", "target_date": "--target-date/-d"}
+    missing = [flag for attr, flag in required.items() if getattr(args, attr) is None]
+    if len(missing) == len(required):
+        # No flags at all — show help
+        parser.parse_args(["calculate", "--help"])
+    elif missing:
+        parser.error(f"the following arguments are required: {', '.join(missing)}")
 
     try:
         result = calculate(

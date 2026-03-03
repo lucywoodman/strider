@@ -58,6 +58,33 @@ class TestCalculateCommand:
         assert "future" in result.stderr.lower()
 
 
+class TestShortFlags:
+    def test_short_flags(self):
+        result = run_strider(
+            "calculate",
+            "-t", "steps",
+            "-g", "300000",
+            "-p", "50000",
+            "-d", "2030-12-31",
+        )
+        assert result.returncode == 0
+        assert "Daily Steps Needed" in result.stdout
+
+    def test_short_flags_distance(self):
+        result = run_strider(
+            "calculate",
+            "-t", "distance",
+            "-g", "200",
+            "-p", "30",
+            "-d", "2030-12-31",
+            "-u", "miles",
+            "-s", "1500",
+            "-k", "4.5",
+        )
+        assert result.returncode == 0
+        assert "Daily Steps Needed" in result.stdout
+
+
 class TestMissingFlags:
     def test_missing_goal_type(self):
         result = run_strider(
@@ -74,6 +101,12 @@ class TestMissingFlags:
         assert "calculate" in result.stdout
         assert "help-stride" in result.stdout
         assert "help-speed" in result.stdout
+
+    def test_calculate_no_flags_shows_help(self):
+        result = run_strider("calculate")
+        assert result.returncode == 0
+        assert "--goal-type" in result.stdout
+        assert "--goal" in result.stdout
 
 
 class TestDateShortcuts:
