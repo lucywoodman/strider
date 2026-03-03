@@ -8,6 +8,14 @@ A CLI walking goal calculator. Figure out how many steps, kilometres, or minutes
 uv sync
 ```
 
+To install `strider` globally so you can run it from anywhere:
+
+```bash
+uv tool install .
+```
+
+Then use `strider` directly instead of `uv run strider`.
+
 ## Usage
 
 ### Calculate daily targets
