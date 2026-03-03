@@ -73,6 +73,29 @@ class TestMissingFlags:
         assert result.returncode != 0
 
 
+class TestDateShortcuts:
+    def test_today_as_target_date(self):
+        result = run_strider(
+            "calculate",
+            "--goal-type", "steps",
+            "--goal", "10000",
+            "--progress", "0",
+            "--target-date", "today",
+        )
+        assert result.returncode == 0
+        assert "1 days" in result.stdout or "already achieved" in result.stdout.lower()
+
+    def test_tomorrow_as_target_date(self):
+        result = run_strider(
+            "calculate",
+            "--goal-type", "steps",
+            "--goal", "10000",
+            "--progress", "0",
+            "--target-date", "tomorrow",
+        )
+        assert result.returncode == 0
+
+
 class TestInvalidInput:
     def test_invalid_date_format(self):
         result = run_strider(

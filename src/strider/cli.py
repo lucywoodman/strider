@@ -1,16 +1,25 @@
 import argparse
 import sys
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from strider.calculator import calculate
 from strider.help_text import SPEED_HELP, STRIDE_HELP
 
+DATE_SHORTCUTS = {
+    "today": lambda: date.today(),
+    "tomorrow": lambda: date.today() + timedelta(days=1),
+}
+
 
 def parse_date(value: str) -> date:
+    if value.lower() in DATE_SHORTCUTS:
+        return DATE_SHORTCUTS[value.lower()]()
     try:
         return datetime.strptime(value, "%Y-%m-%d").date()
     except ValueError:
-        raise argparse.ArgumentTypeError(f"Invalid date format: {value!r} (expected YYYY-MM-DD)")
+        raise argparse.ArgumentTypeError(
+            f"Invalid date format: {value!r} (expected YYYY-MM-DD, 'today', or 'tomorrow')"
+        )
 
 
 def build_parser() -> argparse.ArgumentParser:
