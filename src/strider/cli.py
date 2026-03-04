@@ -104,7 +104,7 @@ def main():
         return
 
     config_path = _config_path()
-    config = load_config(config_path)
+    config, sources = load_config(config_path)
 
     if args.command == "config":
         if args.init:
@@ -115,11 +115,9 @@ def main():
                 print(f"Config file already exists at {config_path}")
             return
 
-        print(f"Config file: {config_path}")
         if config_path.exists():
-            print("Source: config file + defaults")
-        else:
-            print("Source: defaults (no config file found)")
+            print(f"Config file: {config_path}")
+        print(f"Source: {' + '.join(sources)}")
         print()
         for key, value in config.items():
             print(f"  {key} = {value}")
