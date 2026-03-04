@@ -4,9 +4,9 @@ version = "0.1.0"
 description = "A CLI walking goal calculator"
 readme = "README.md"
 authors = [
-    { name = "Lucy Woodman", email = "lucy.woodman@wpengine.com" }
+    { name = "Lucy Woodman", email = "strider@woodman.email" }
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
