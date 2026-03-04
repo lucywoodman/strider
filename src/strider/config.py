@@ -17,9 +17,14 @@ ENV_VARS = {
 }
 
 
-def load_config(config_path: Path = CONFIG_PATH) -> dict:
-    """Load config with precedence: env vars > config file > defaults."""
+def load_config(config_path: Path = CONFIG_PATH) -> tuple[dict, list[str]]:
+    """Load config with precedence: env vars > config file > defaults.
+
+    Returns a (config_dict, sources) tuple where sources lists
+    which layers contributed values (e.g. ["defaults", "config file", "env vars"]).
+    """
     config = dict(DEFAULTS)
+    sources = ["defaults"]
 
     # Layer config file values
     if config_path.exists():
@@ -28,14 +33,19 @@ def load_config(config_path: Path = CONFIG_PATH) -> dict:
         for key in DEFAULTS:
             if key in file_config:
                 config[key] = file_config[key]
+        sources.append("config file")
 
     # Layer env var values
+    has_env = False
     for key, (env_name, cast) in ENV_VARS.items():
         value = os.environ.get(env_name)
         if value is not None:
             config[key] = cast(value)
+            has_env = True
+    if has_env:
+        sources.append("env vars")
 
-    return config
+    return config, sources
 
 
 def create_config(config_path: Path = CONFIG_PATH) -> bool:

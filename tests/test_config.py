@@ -11,9 +11,10 @@ class TestLoadConfigDefaults:
         monkeypatch.delenv("STRIDER_SPEED", raising=False)
         monkeypatch.delenv("STRIDER_UNIT", raising=False)
 
-        result = load_config(config_path)
+        result, sources = load_config(config_path)
 
         assert result == DEFAULTS
+        assert sources == ["defaults"]
 
     def test_reads_values_from_config_file(self, tmp_path, monkeypatch):
         config_path = tmp_path / "config.toml"
@@ -22,11 +23,12 @@ class TestLoadConfigDefaults:
         monkeypatch.delenv("STRIDER_SPEED", raising=False)
         monkeypatch.delenv("STRIDER_UNIT", raising=False)
 
-        result = load_config(config_path)
+        result, sources = load_config(config_path)
 
         assert result["steps_per_km"] == 1320
         assert result["speed"] == 4.8
         assert result["unit"] == "km"
+        assert sources == ["defaults", "config file"]
 
     def test_partial_config_fills_rest_from_defaults(self, tmp_path, monkeypatch):
         config_path = tmp_path / "config.toml"
@@ -35,11 +37,12 @@ class TestLoadConfigDefaults:
         monkeypatch.delenv("STRIDER_SPEED", raising=False)
         monkeypatch.delenv("STRIDER_UNIT", raising=False)
 
-        result = load_config(config_path)
+        result, sources = load_config(config_path)
 
         assert result["steps_per_km"] == 1200
         assert result["speed"] == DEFAULTS["speed"]
         assert result["unit"] == DEFAULTS["unit"]
+        assert sources == ["defaults", "config file"]
 
 
 class TestLoadConfigEnvVars:
@@ -50,11 +53,12 @@ class TestLoadConfigEnvVars:
         monkeypatch.setenv("STRIDER_SPEED", "6.0")
         monkeypatch.setenv("STRIDER_UNIT", "miles")
 
-        result = load_config(config_path)
+        result, sources = load_config(config_path)
 
         assert result["steps_per_km"] == 1500
         assert result["speed"] == 6.0
         assert result["unit"] == "miles"
+        assert sources == ["defaults", "config file", "env vars"]
 
     def test_env_vars_override_defaults(self, tmp_path, monkeypatch):
         config_path = tmp_path / "config.toml"
@@ -62,10 +66,11 @@ class TestLoadConfigEnvVars:
         monkeypatch.delenv("STRIDER_STEPS_PER_KM", raising=False)
         monkeypatch.delenv("STRIDER_UNIT", raising=False)
 
-        result = load_config(config_path)
+        result, sources = load_config(config_path)
 
         assert result["speed"] == 3.5
         assert result["steps_per_km"] == DEFAULTS["steps_per_km"]
+        assert sources == ["defaults", "env vars"]
 
 
 class TestCreateConfig:
