@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 
@@ -154,3 +155,58 @@ class TestHelpSubcommands:
         result = run_strider("help-speed")
         assert result.returncode == 0
         assert "walking speed" in result.stdout.lower()
+
+
+class TestConfigSubcommand:
+    def test_config_shows_current_values(self):
+        result = run_strider("config")
+        assert result.returncode == 0
+        assert "steps_per_km" in result.stdout
+        assert "speed" in result.stdout
+        assert "unit" in result.stdout
+
+    def test_config_init_creates_file(self, tmp_path):
+        config_path = tmp_path / "config.toml"
+        env = os.environ.copy()
+        env["STRIDER_CONFIG_PATH"] = str(config_path)
+        result = subprocess.run(
+            [sys.executable, "-m", "strider.cli", "config", "--init"],
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+        assert result.returncode == 0
+        assert config_path.exists()
+        assert "Created" in result.stdout
+
+    def test_config_init_does_not_overwrite(self, tmp_path):
+        config_path = tmp_path / "config.toml"
+        config_path.write_text("steps_per_km = 9999\n")
+        env = os.environ.copy()
+        env["STRIDER_CONFIG_PATH"] = str(config_path)
+        result = subprocess.run(
+            [sys.executable, "-m", "strider.cli", "config", "--init"],
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+        assert result.returncode == 0
+        assert "already exists" in result.stdout.lower()
+
+
+class TestEnvVarsAffectCalculation:
+    def test_env_speed_affects_walking_time(self):
+        env = os.environ.copy()
+        env["STRIDER_SPEED"] = "10.0"
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "strider.cli",
+                "calculate",
+                "-t", "steps", "-g", "300000", "-p", "50000", "-d", "2030-12-31",
+            ],
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+        assert result.returncode == 0
+        assert "Daily Walking Time" in result.stdout

@@ -40,3 +40,25 @@ Factors that affect speed:
   - Your fitness level
 
 Default used: 5 km/h (a comfortable brisk pace for most people)"""
+
+CONFIG_HELP = """\
+Configuration
+==============
+
+Strider reads personal defaults from ~/.config/strider/config.toml
+so you don't have to pass --steps-per-km, --speed, and --unit every time.
+
+Quick start:
+  strider config --init    Create a starter config file
+  strider config           Show current resolved values
+
+Precedence (highest to lowest):
+  1. CLI flags (--speed 6.0)
+  2. Environment variables (STRIDER_SPEED=6.0)
+  3. Config file (~/.config/strider/config.toml)
+  4. Built-in defaults
+
+Environment variables:
+  STRIDER_STEPS_PER_KM     Steps per kilometre
+  STRIDER_SPEED            Walking speed in km/h
+  STRIDER_UNIT             Preferred unit (km or miles)"""

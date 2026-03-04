@@ -1,9 +1,12 @@
 import argparse
+import os
 import sys
 from datetime import date, datetime, timedelta
+from pathlib import Path
 
 from strider.calculator import calculate
-from strider.help_text import SPEED_HELP, STRIDE_HELP
+from strider.config import CONFIG_PATH, load_config, create_config
+from strider.help_text import CONFIG_HELP, SPEED_HELP, STRIDE_HELP
 
 DATE_SHORTCUTS = {
     "today": lambda: date.today(),
@@ -22,6 +25,14 @@ def parse_date(value: str) -> date:
         )
 
 
+def _config_path() -> Path:
+    """Return config path, allowing override via env var for testing."""
+    override = os.environ.get("STRIDER_CONFIG_PATH")
+    if override:
+        return Path(override)
+    return CONFIG_PATH
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="strider",
@@ -35,12 +46,16 @@ def build_parser() -> argparse.ArgumentParser:
     calc.add_argument("-g", "--goal", type=float)
     calc.add_argument("-p", "--progress", type=float)
     calc.add_argument("-d", "--target-date", type=parse_date)
-    calc.add_argument("-s", "--steps-per-km", type=float, default=1400)
-    calc.add_argument("-k", "--speed", type=float, default=5.0)
-    calc.add_argument("-u", "--unit", choices=["km", "miles"], default="km")
+    calc.add_argument("-s", "--steps-per-km", type=float, default=None)
+    calc.add_argument("-k", "--speed", type=float, default=None)
+    calc.add_argument("-u", "--unit", choices=["km", "miles"], default=None)
 
     subparsers.add_parser("help-stride", help="How to estimate steps per km")
     subparsers.add_parser("help-speed", help="How to estimate walking speed")
+    subparsers.add_parser("help-config", help="How to configure personal defaults")
+
+    cfg = subparsers.add_parser("config", help="Show or initialise config")
+    cfg.add_argument("--init", action="store_true", help="Create a starter config file")
 
     return parser
 
@@ -83,6 +98,40 @@ def main():
     if args.command == "help-speed":
         print(SPEED_HELP)
         return
+
+    if args.command == "help-config":
+        print(CONFIG_HELP)
+        return
+
+    config_path = _config_path()
+    config = load_config(config_path)
+
+    if args.command == "config":
+        if args.init:
+            created = create_config(config_path)
+            if created:
+                print(f"Created config file at {config_path}")
+            else:
+                print(f"Config file already exists at {config_path}")
+            return
+
+        print(f"Config file: {config_path}")
+        if config_path.exists():
+            print("Source: config file + defaults")
+        else:
+            print("Source: defaults (no config file found)")
+        print()
+        for key, value in config.items():
+            print(f"  {key} = {value}")
+        return
+
+    # Fill in None args from config
+    if args.steps_per_km is None:
+        args.steps_per_km = config["steps_per_km"]
+    if args.speed is None:
+        args.speed = config["speed"]
+    if args.unit is None:
+        args.unit = config["unit"]
 
     required = {"goal_type": "--goal-type/-t", "goal": "--goal/-g",
                 "progress": "--progress/-p", "target_date": "--target-date/-d"}
