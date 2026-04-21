@@ -17,6 +17,8 @@ class WalkingResult:
     time_minutes: int
     achieved: bool
     achievable: bool
+    current_daily_average: float | None = None
+    warning: str | None = None
 
 
 def calculate(
@@ -28,6 +30,7 @@ def calculate(
     speed: float = 5.0,
     unit: str = "km",
     today: date | None = None,
+    current_daily_average: float | None = None,
 ) -> WalkingResult:
     if today is None:
         today = date.today()
@@ -59,12 +62,20 @@ def calculate(
             time_minutes=0,
             achieved=True,
             achievable=True,
+            current_daily_average=current_daily_average,
         )
 
     daily_steps_needed = steps_remaining / days_remaining
     daily_km = daily_steps_needed / steps_per_km
     daily_miles = daily_km / MILES_TO_KM
     daily_time = daily_km / speed  # hours
+
+    warning = None
+    if current_daily_average is not None and daily_steps_needed > 2 * current_daily_average:
+        warning = (
+            f"This requires more than doubling your current average"
+            f" of {round(current_daily_average):,} steps/day."
+        )
 
     return WalkingResult(
         steps_remaining=math.ceil(steps_remaining),
@@ -76,4 +87,6 @@ def calculate(
         time_minutes=round((daily_time % 1) * 60),
         achieved=False,
         achievable=daily_steps_needed <= ACHIEVABLE_THRESHOLD,
+        current_daily_average=current_daily_average,
+        warning=warning,
     )

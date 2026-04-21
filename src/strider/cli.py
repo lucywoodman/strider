@@ -49,6 +49,8 @@ def build_parser() -> argparse.ArgumentParser:
     calc.add_argument("-s", "--steps-per-km", type=float, default=None)
     calc.add_argument("-k", "--speed", type=float, default=None)
     calc.add_argument("-u", "--unit", choices=["km", "miles"], default=None)
+    calc.add_argument("-a", "--current-average", type=float, default=None,
+                      help="Your current daily step average (enables warning if target is ambitious)")
 
     subparsers.add_parser("help-stride", help="How to estimate steps per km")
     subparsers.add_parser("help-speed", help="How to estimate walking speed")
@@ -80,6 +82,10 @@ def format_result(result) -> str:
         f"  {'Daily Distance Needed:':<24} {result.daily_km:>10.1f} km ({result.daily_miles:.1f} miles)",
         f"  {'Daily Walking Time:':<24} {result.time_hours:>4}h {result.time_minutes:02}min",
     ]
+
+    if result.warning:
+        lines.extend(["", f"  Note: {result.warning}"])
+
     return "\n".join(lines)
 
 
@@ -149,6 +155,7 @@ def main():
             steps_per_km=args.steps_per_km,
             speed=args.speed,
             unit=args.unit,
+            current_daily_average=args.current_average,
         )
     except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)
