@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Guide to estimating steps per kilometre and walking speed for Strider.">
+    <title>Guide & Settings - Strider</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .guide-section {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .guide-section h2,
+        .guide-section h3,
+        .guide-section p {
+            margin: 0;
+        }
+
+        .guide-section-header {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            background: var(--accent-bg);
+        }
+
+        .guide-section-header h2 {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            max-width: unset;
+        }
+
+        .guide-block {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .guide-block:last-child {
+            border-bottom: none;
+        }
+
+        .guide-block h3 {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .guide-block ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .guide-block li {
+            font-size: 13px;
+            line-height: 1.5;
+            padding: 2px 0;
+        }
+
+        .guide-block p {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .guide-footer {
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .guide-footer label {
+            font-size: 12px;
+            color: var(--muted);
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .guide-footer input {
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 16px;
+            background: var(--bg);
+            color: var(--fg);
+            width: 100px;
+            text-align: right;
+        }
+
+        .guide-footer input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .settings-saved {
+            font-size: 11px;
+            color: var(--success, #4a9);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .settings-saved.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <header class="hero-header">
+            <h1>Guide & Settings</h1>
+            <nav><a href="index.html">&larr; Calculator</a></nav>
+        </header>
+
+        <div class="stack stack-l" style="padding-bottom: 2rem;">
+            <div id="steps-per-km" class="guide-section">
+                <div class="guide-section-header">
+                    <h2>Steps per Kilometre</h2>
+                </div>
+
+                <div class="guide-block">
+                    <h3>Quick Averages by Height</h3>
+                    <ul>
+                        <li>Under 5'4" / 163cm — ~1,500-1,600 steps/km</li>
+                        <li>5'4"-5'10" / 163-178cm — ~1,300-1,500 steps/km</li>
+                        <li>Over 5'10" / 178cm — ~1,200-1,400 steps/km</li>
+                    </ul>
+                </div>
+
+                <div class="guide-block">
+                    <h3>More Accurate Methods</h3>
+                    <ul>
+                        <li>Walk a known 1km route and count your steps</li>
+                        <li>Use a football pitch (~100m) — walk 10 lengths, multiply by 10</li>
+                        <li>Use a smartphone step counter against a known distance</li>
+                    </ul>
+                </div>
+
+                <div class="guide-footer">
+                    <label for="settingStepsPerKm">Your steps/km</label>
+                    <span class="settings-saved" id="stepsPerKmSaved">Saved</span>
+                    <input type="number" id="settingStepsPerKm" value="1400" placeholder="1400">
+                </div>
+            </div>
+
+            <div id="walking-speed" class="guide-section">
+                <div class="guide-section-header">
+                    <h2>Walking Speed</h2>
+                </div>
+
+                <div class="guide-block">
+                    <h3>Typical Speeds</h3>
+                    <ul>
+                        <li>Leisurely stroll — 3-4 km/h</li>
+                        <li>Comfortable pace — 4-5 km/h</li>
+                        <li>Brisk walk — 5-6 km/h</li>
+                        <li>Fast walk — 6-7 km/h</li>
+                    </ul>
+                </div>
+
+                <div class="guide-block">
+                    <h3>Quick Test</h3>
+                    <ul>
+                        <li>Time yourself walking 1km</li>
+                        <li>10 minutes = 6 km/h</li>
+                        <li>12 minutes = 5 km/h</li>
+                        <li>15 minutes = 4 km/h</li>
+                    </ul>
+                </div>
+
+                <div class="guide-block">
+                    <h3>Factors That Affect Speed</h3>
+                    <ul>
+                        <li>Terrain (hills, paths vs roads)</li>
+                        <li>Weather conditions</li>
+                        <li>Walking the dog (usually slower!)</li>
+                        <li>Your fitness level</li>
+                    </ul>
+                </div>
+
+                <div class="guide-footer">
+                    <label for="settingWalkingSpeed">Your speed (km/h)</label>
+                    <span class="settings-saved" id="walkingSpeedSaved">Saved</span>
+                    <input type="number" id="settingWalkingSpeed" step="0.1" value="5.0" placeholder="5.0">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function initSetting(inputId, savedId, storageKey, fallback) {
+            const input = document.getElementById(inputId);
+            const saved = document.getElementById(savedId);
+            const stored = localStorage.getItem(storageKey);
+
+            if (stored) input.value = stored;
+
+            input.addEventListener('input', function () {
+                const value = parseFloat(this.value);
+                if (!isNaN(value) && value > 0) {
+                    localStorage.setItem(storageKey, this.value);
+                    saved.classList.add('visible');
+                    setTimeout(() => saved.classList.remove('visible'), 1500);
+                }
+            });
+        }
+
+        initSetting('settingStepsPerKm', 'stepsPerKmSaved', 'stepsPerKm', '1400');
+        initSetting('settingWalkingSpeed', 'walkingSpeedSaved', 'walkingSpeed', '5.0');
+    </script>
+</body>
+
+</html>

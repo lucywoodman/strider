@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Strider: How many steps do I need to take to meet my step goal?">
+    <meta name="keywords" content="steps, step goal, distance goal, distance, km, mile, garmin challenge, strava challenge">
+    <title>Strider</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <main id="mainContent">
+        <header class="hero-header">
+            <h1>Strider</h1>
+            <nav><a href="help.html">Guide &amp; Settings &rarr;</a></nav>
+        </header>
+
+        <section class="region">
+            <div class="center">
+                <div class="stack stack-l">
+                    <form id="calculatorForm" class="box stack">
+                        <div class="stack stack-s">
+                            <label for="goalType">Goal Type</label>
+                            <select id="goalType" onchange="toggleUnits()">
+                                <option value="steps">Steps</option>
+                                <option value="distance">Distance</option>
+                            </select>
+                        </div>
+
+                        <div class="stack stack-s">
+                            <label for="goalAmount">Goal Amount</label>
+                            <input type="number" id="goalAmount" placeholder="e.g. 300000" required>
+                        </div>
+
+                        <div id="distanceUnitGroup" class="stack stack-s" style="display: none;">
+                            <label for="distanceUnit">Distance Unit</label>
+                            <select id="distanceUnit">
+                                <option value="km">Kilometres</option>
+                                <option value="miles">Miles</option>
+                            </select>
+                        </div>
+
+                        <div class="stack stack-s">
+                            <label for="currentProgress">Current Progress</label>
+                            <input type="number" id="currentProgress" placeholder="e.g. 90000" required>
+                        </div>
+
+                        <div class="stack stack-s">
+                            <label for="targetDate">Target Date</label>
+                            <input type="date" id="targetDate" required>
+                        </div>
+
+                        <div class="stack stack-s">
+                            <label for="currentAverage">Current Daily Average (optional)</label>
+                            <input type="number" id="currentAverage" placeholder="e.g. 8000">
+                        </div>
+
+                        <button type="submit" class="button" data-button-variant="primary">Calculate My Daily Target</button>
+                    </form>
+
+                    <div id="results" hidden>
+                        <div id="resultsContent" class="stack stack-l"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="assets/js/app.js"></script>
+</body>
+
+</html>

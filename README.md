@@ -1,6 +1,8 @@
 # Strider
 
-A CLI walking goal calculator. Figure out how many steps, kilometres, or minutes you need to walk each day to hit a goal by a deadline.
+A walking goal calculator. Figure out how many steps, kilometres, or minutes you need to walk each day to hit a goal by a deadline.
+
+Available as a [CLI tool](#setup) and a [web app](https://lucywoodman.github.io/strider/).
 
 ## Setup
 
