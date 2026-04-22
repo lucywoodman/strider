@@ -187,3 +187,55 @@ class TestEdgeCases:
             target_date=date(2030, 12, 31),
         )
         assert result.days_remaining > 0
+
+
+class TestWarning:
+    def test_no_warning_when_no_average_provided(self):
+        result = calculate(
+            goal_type="steps",
+            goal=300_000,
+            progress=50_000,
+            target_date=date(2026, 3, 31),
+            today=date(2026, 3, 3),
+        )
+        assert result.warning is None
+        assert result.current_daily_average is None
+
+    def test_no_warning_below_2x_threshold(self):
+        # 250,000 / 29 days = 8,621 steps/day, average 5,000
+        # ratio 1.7x — below 2x, no warning
+        result = calculate(
+            goal_type="steps",
+            goal=300_000,
+            progress=50_000,
+            target_date=date(2026, 3, 31),
+            current_daily_average=5_000,
+            today=date(2026, 3, 3),
+        )
+        assert result.warning is None
+        assert result.current_daily_average == 5_000
+
+    def test_warning_when_exceeds_2x_average(self):
+        # 250,000 / 29 days = 8,621 steps/day, average 3,000
+        # ratio 2.87x — above 2x, should warn
+        result = calculate(
+            goal_type="steps",
+            goal=300_000,
+            progress=50_000,
+            target_date=date(2026, 3, 31),
+            current_daily_average=3_000,
+            today=date(2026, 3, 3),
+        )
+        assert result.warning is not None
+
+    def test_no_warning_when_already_achieved(self):
+        result = calculate(
+            goal_type="steps",
+            goal=100_000,
+            progress=100_000,
+            target_date=date(2026, 3, 31),
+            current_daily_average=3_000,
+            today=date(2026, 3, 3),
+        )
+        assert result.achieved is True
+        assert result.warning is None

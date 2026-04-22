@@ -194,6 +194,44 @@ class TestConfigSubcommand:
         assert "already exists" in result.stdout.lower()
 
 
+class TestWarningFlag:
+    def test_warning_shown_when_target_exceeds_2x_average(self):
+        result = run_strider(
+            "calculate",
+            "-t", "steps",
+            "-g", "300000",
+            "-p", "0",
+            "-d", "tomorrow",
+            "--current-average", "1000",
+        )
+        assert result.returncode == 0
+        assert "Note:" in result.stdout
+        assert "doubling" in result.stdout
+
+    def test_no_warning_when_average_not_provided(self):
+        result = run_strider(
+            "calculate",
+            "-t", "steps",
+            "-g", "300000",
+            "-p", "50000",
+            "-d", "2030-12-31",
+        )
+        assert result.returncode == 0
+        assert "Note:" not in result.stdout
+
+    def test_short_flag(self):
+        result = run_strider(
+            "calculate",
+            "-t", "steps",
+            "-g", "300000",
+            "-p", "0",
+            "-d", "tomorrow",
+            "-a", "1000",
+        )
+        assert result.returncode == 0
+        assert "Note:" in result.stdout
+
+
 class TestEnvVarsAffectCalculation:
     def test_env_speed_affects_walking_time(self):
         env = os.environ.copy()
