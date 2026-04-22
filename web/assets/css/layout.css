@@ -1,0 +1,221 @@
+/* === STACK PRIMITIVE === */
+.stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.stack > * {
+  margin-block: 0;
+}
+
+.stack > * + * {
+  margin-block-start: var(--space, var(--space-m));
+}
+
+.stack-s { --space: var(--space-s); }
+.stack-m { --space: var(--space-m); }
+.stack-l { --space: var(--space-l); }
+.stack-xl { --space: var(--space-xl); }
+
+/* === CENTER PRIMITIVE === */
+.center {
+  box-sizing: content-box;
+  margin-inline: auto;
+  max-inline-size: var(--measure, var(--measure));
+  padding-inline-start: var(--gutter, var(--space-m));
+  padding-inline-end: var(--gutter, var(--space-m));
+}
+
+.center-text {
+  text-align: center;
+}
+
+.center-intrinsic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* === BOX PRIMITIVE === */
+.box {
+  padding: var(--padding, var(--space-m));
+  border: var(--border-width, 0) solid;
+  border-color: var(--border-color);
+  border-radius: var(--border-radius, 0);
+  background-color: var(--box-bg, --color-light);
+  color: var(--box-color, --color-dark);
+}
+
+.box * {
+  color: inherit;
+}
+
+.box-invert {
+  color: var(--color-light);
+  background-color: var(--color-dark);
+}
+
+/* === CLUSTER PRIMITIVE === */
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space, var(--space-m));
+  justify-content: var(--justify, flex-start);
+  align-items: var(--align, center);
+}
+
+.cluster-center { --justify: center; }
+.cluster-end { --justify: flex-end; }
+.cluster-between { --justify: space-between; }
+.cluster-around { --justify: space-around; }
+
+/* === ENHANCED GRID PRIMITIVE === */
+.grid {
+  display: grid;
+  gap: var(--grid-gap, var(--gutter, var(--space-s-l)));
+  grid-template-columns: repeat(var(--grid-placement, auto-fill), minmax(var(--grid-min-item-size, 16rem), 1fr));
+}
+
+.grid-fit {
+  --grid-placement: auto-fit;
+}
+
+.grid-no-stretch {
+  align-items: start;
+}
+
+.grid[data-layout=halves] {
+    --grid-placement: auto-fit;
+    --grid-min-item-size: clamp(16rem,50vw,33rem)
+}
+
+.grid[data-layout=thirds] {
+    --grid-placement: auto-fit;
+    --grid-min-item-size: clamp(16rem,33%,20rem)
+}
+
+/* === SIDEBAR PRIMITIVE === */
+.sidebar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gutter, var(--space-m));
+}
+
+.sidebar > :first-child {
+  flex-basis: var(--sidebar-width, 20rem);
+  flex-grow: 1;
+}
+
+.sidebar > :last-child {
+  flex-basis: 0;
+  flex-grow: 999;
+  min-inline-size: var(--sidebar-content-min, 50%);
+}
+
+/* === SWITCHER PRIMITIVE === */
+.switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gutter, var(--space-m));
+}
+
+.switcher > * {
+  flex-grow: 1;
+  flex-basis: calc((var(--switcher-threshold, 30rem) - 100%) * 999);
+}
+
+.switcher > :nth-last-child(n+5),
+.switcher > :nth-last-child(n+5) ~ * {
+  flex-basis: 100%;
+}
+
+/* === COVER PRIMITIVE === */
+.cover {
+  display: flex;
+  flex-direction: column;
+  min-block-size: var(--cover-height, 100vh);
+  padding: var(--cover-padding, var(--space-m));
+}
+
+.cover > * {
+  margin-block: var(--cover-space, var(--space-m));
+}
+
+.cover > :first-child:not(.cover-centered) {
+  margin-block-start: 0;
+}
+
+.cover > :last-child:not(.cover-centered) {
+  margin-block-end: 0;
+}
+
+.cover > .cover-centered {
+  margin-block: auto;
+}
+
+/* === FRAME PRIMITIVE === */
+.frame {
+  aspect-ratio: var(--frame-ratio, 16 / 9);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.frame > img,
+.frame > video {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* === REEL PRIMITIVE === */
+.reel {
+  display: flex;
+  block-size: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-color: var(--scrollbar-color, #fff) var(--scrollbar-bg, #000);
+}
+
+.reel::-webkit-scrollbar {
+  block-size: 1rem;
+}
+
+.reel::-webkit-scrollbar-track {
+  background-color: var(--scrollbar-bg, #000);
+}
+
+.reel::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-color, #fff);
+}
+
+.reel > * {
+  flex: 0 0 auto;
+}
+
+.reel > img {
+  block-size: 100%;
+  flex-basis: auto;
+  inline-size: auto;
+}
+
+.reel > * + * {
+  margin-inline-start: var(--space, var(--space-m));
+}
+
+.reel.overflowing {
+  padding-block-end: var(--space, var(--space-m));
+}
+
+/* === IMPOSTER PRIMITIVE === */
+.imposter {
+  position: fixed;
+  inset: var(--imposter-margin, 0);
+  z-index: var(--imposter-z-index, 999);
+}
+
+.imposter-contain {
+  overflow: auto;
+}
