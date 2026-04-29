@@ -50,6 +50,8 @@ uv run strider calculate \
 | `--unit` | `-u` | no | config or `km` | `km` or `miles` (distance goals) |
 | `--steps-per-km` | `-s` | no | config or `1400` | Your stride rate |
 | `--speed` | `-k` | no | config or `5.0` | Walking speed in km/h |
+| `--max-steps` | `-m` | no | config or none | Max steps per day (caps daily target) |
+| `--steps-today` | | no | | Steps already done today (shows today-aware breakdown) |
 
 ### Configuration
 
@@ -66,6 +68,7 @@ The config file looks like:
 steps_per_km = 1320
 speed = 4.8
 unit = "km"
+max_steps_per_day = 15000
 ```
 
 Values are resolved in this order (highest wins):
@@ -80,6 +83,7 @@ Values are resolved in this order (highest wins):
 | `STRIDER_STEPS_PER_KM` | Steps per kilometre |
 | `STRIDER_SPEED` | Walking speed in km/h |
 | `STRIDER_UNIT` | Preferred unit (`km` or `miles`) |
+| `STRIDER_MAX_STEPS` | Max steps per day |
 
 ### Help guides
 
