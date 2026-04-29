@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from datetime import date
 
 MILES_TO_KM = 1.60934
-ACHIEVABLE_THRESHOLD = 25_000  # steps/day
 
 
 @dataclass
@@ -17,8 +16,7 @@ class WalkingResult:
     time_minutes: int
     achieved: bool
     achievable: bool
-    current_daily_average: float | None = None
-    warning: str | None = None
+    steps_today: int | None = None
 
 
 def calculate(
@@ -30,7 +28,8 @@ def calculate(
     speed: float = 5.0,
     unit: str = "km",
     today: date | None = None,
-    current_daily_average: float | None = None,
+    max_steps_per_day: int | None = None,
+    steps_done_today: int | None = None,
 ) -> WalkingResult:
     if today is None:
         today = date.today()
@@ -62,20 +61,37 @@ def calculate(
             time_minutes=0,
             achieved=True,
             achievable=True,
-            current_daily_average=current_daily_average,
         )
 
-    daily_steps_needed = steps_remaining / days_remaining
+    # Achievability check based on max_steps_per_day
+    if max_steps_per_day is not None:
+        today_capacity = max_steps_per_day - (steps_done_today or 0)
+        total_capacity = max(0, today_capacity) + max_steps_per_day * (days_remaining - 1)
+        achievable = steps_remaining <= total_capacity
+    else:
+        achievable = True
+
+    # Calculate today-aware breakdown when steps_done_today is provided
+    steps_today = None
+    if steps_done_today is not None:
+        fair_share = steps_remaining / days_remaining
+        if max_steps_per_day is not None:
+            capped_today = min(fair_share, max_steps_per_day)
+        else:
+            capped_today = fair_share
+        steps_today = max(0, math.ceil(capped_today - steps_done_today))
+
+        if days_remaining > 1:
+            steps_after_today = steps_remaining - steps_today
+            daily_steps_needed = steps_after_today / (days_remaining - 1)
+        else:
+            daily_steps_needed = steps_today
+    else:
+        daily_steps_needed = steps_remaining / days_remaining
+
     daily_km = daily_steps_needed / steps_per_km
     daily_miles = daily_km / MILES_TO_KM
     daily_time = daily_km / speed  # hours
-
-    warning = None
-    if current_daily_average is not None and daily_steps_needed > 2 * current_daily_average:
-        warning = (
-            f"This requires more than doubling your current average"
-            f" of {round(current_daily_average):,} steps/day."
-        )
 
     return WalkingResult(
         steps_remaining=math.ceil(steps_remaining),
@@ -86,7 +102,6 @@ def calculate(
         time_hours=int(daily_time),
         time_minutes=round((daily_time % 1) * 60),
         achieved=False,
-        achievable=daily_steps_needed <= ACHIEVABLE_THRESHOLD,
-        current_daily_average=current_daily_average,
-        warning=warning,
+        achievable=achievable,
+        steps_today=steps_today,
     )

@@ -190,6 +190,22 @@
                     <input type="number" id="settingWalkingSpeed" step="0.1" value="5.0" placeholder="5.0">
                 </div>
             </div>
+            <div id="max-steps" class="guide-section">
+                <div class="guide-section-header">
+                    <h2>Max Steps Per Day</h2>
+                </div>
+
+                <div class="guide-block">
+                    <p>Set this to cap your daily target based on your available time and energy.
+                        Leave empty for no limit.</p>
+                </div>
+
+                <div class="guide-footer">
+                    <label for="settingMaxSteps">Your max steps/day</label>
+                    <span class="settings-saved" id="maxStepsSaved">Saved</span>
+                    <input type="number" id="settingMaxSteps" placeholder="e.g. 15000">
+                </div>
+            </div>
         </div>
     </main>
 
@@ -213,6 +229,7 @@
 
         initSetting('settingStepsPerKm', 'stepsPerKmSaved', 'stepsPerKm', '1400');
         initSetting('settingWalkingSpeed', 'walkingSpeedSaved', 'walkingSpeed', '5.0');
+        initSetting('settingMaxSteps', 'maxStepsSaved', 'maxStepsPerDay', '');
     </script>
 </body>
 

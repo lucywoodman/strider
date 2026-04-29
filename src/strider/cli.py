@@ -49,8 +49,10 @@ def build_parser() -> argparse.ArgumentParser:
     calc.add_argument("-s", "--steps-per-km", type=float, default=None)
     calc.add_argument("-k", "--speed", type=float, default=None)
     calc.add_argument("-u", "--unit", choices=["km", "miles"], default=None)
-    calc.add_argument("-a", "--current-average", type=float, default=None,
-                      help="Your current daily step average (enables warning if target is ambitious)")
+    calc.add_argument("-m", "--max-steps", type=int, default=None,
+                      help="Maximum steps you want to do per day (caps daily target)")
+    calc.add_argument("--steps-today", type=int, default=None,
+                      help="Steps already done today (shows today-aware breakdown)")
 
     subparsers.add_parser("help-stride", help="How to estimate steps per km")
     subparsers.add_parser("help-speed", help="How to estimate walking speed")
@@ -66,25 +68,31 @@ def format_result(result) -> str:
     if result.achieved:
         return "Congratulations! You've already achieved your goal!"
 
-    status = "Achievable!" if result.achievable else "Challenging!"
+    status = "Achievable!" if result.achievable else "Not achievable!"
     advice = (
         "This target looks achievable with consistent effort."
         if result.achievable
-        else "This target is quite ambitious - consider if it's realistic for your lifestyle."
+        else "This exceeds your max steps per day - consider extending your deadline."
     )
 
     lines = [
         f"  {status} {advice}",
         "",
-        f"  {'Steps Remaining:':<24} {result.steps_remaining:>10,} steps",
-        f"  {'Days Remaining:':<24} {result.days_remaining:>10,} days",
-        f"  {'Daily Steps Needed:':<24} {result.daily_steps:>10,} steps/day",
-        f"  {'Daily Distance Needed:':<24} {result.daily_km:>10.1f} km ({result.daily_miles:.1f} miles)",
-        f"  {'Daily Walking Time:':<24} {result.time_hours:>4}h {result.time_minutes:02}min",
+        f"  {'Steps Remaining:':<30} {result.steps_remaining:>10,} steps",
+        f"  {'Days Remaining:':<30} {result.days_remaining:>10,} days",
     ]
 
-    if result.warning:
-        lines.extend(["", f"  Note: {result.warning}"])
+    if result.steps_today is not None:
+        lines.append(f"  {'Steps to go today:':<30} {result.steps_today:>10,} steps")
+        if result.days_remaining > 1:
+            lines.append(f"  {'Steps per day after today:':<30} {result.daily_steps:>10,} steps/day")
+    else:
+        lines.append(f"  {'Daily Steps Needed:':<30} {result.daily_steps:>10,} steps/day")
+
+    lines.extend([
+        f"  {'Daily Distance Needed:':<30} {result.daily_km:>10.1f} km ({result.daily_miles:.1f} miles)",
+        f"  {'Daily Walking Time:':<30} {result.time_hours:>4}h {result.time_minutes:02}min",
+    ])
 
     return "\n".join(lines)
 
@@ -136,6 +144,8 @@ def main():
         args.speed = config["speed"]
     if args.unit is None:
         args.unit = config["unit"]
+    if args.max_steps is None:
+        args.max_steps = config["max_steps_per_day"]
 
     required = {"goal_type": "--goal-type/-t", "goal": "--goal/-g",
                 "progress": "--progress/-p", "target_date": "--target-date/-d"}
@@ -155,7 +165,8 @@ def main():
             steps_per_km=args.steps_per_km,
             speed=args.speed,
             unit=args.unit,
-            current_daily_average=args.current_average,
+            max_steps_per_day=args.max_steps,
+            steps_done_today=args.steps_today,
         )
     except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)

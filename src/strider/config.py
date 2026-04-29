@@ -6,6 +6,7 @@ DEFAULTS = {
     "steps_per_km": 1400,
     "speed": 5.0,
     "unit": "km",
+    "max_steps_per_day": None,
 }
 
 CONFIG_PATH = Path.home() / ".config" / "strider" / "config.toml"
@@ -14,6 +15,7 @@ ENV_VARS = {
     "steps_per_km": ("STRIDER_STEPS_PER_KM", float),
     "speed": ("STRIDER_SPEED", float),
     "unit": ("STRIDER_UNIT", str),
+    "max_steps_per_day": ("STRIDER_MAX_STEPS", int),
 }
 
 

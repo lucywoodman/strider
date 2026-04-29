@@ -1,5 +1,5 @@
 // Form fields to cache in localStorage
-const cachedFields = ['goalType', 'goalAmount', 'distanceUnit', 'currentProgress', 'targetDate', 'currentAverage'];
+const cachedFields = ['goalType', 'goalAmount', 'distanceUnit', 'currentProgress', 'targetDate', 'stepsDoneToday'];
 
 // Restore cached values on load
 cachedFields.forEach(id => {
@@ -45,8 +45,10 @@ function calculateTarget() {
     const stepsPerKm = parseFloat(localStorage.getItem('stepsPerKm')) || 1400;
     const walkingSpeed = parseFloat(localStorage.getItem('walkingSpeed')) || 5.0;
     const distanceUnit = document.getElementById('distanceUnit').value;
-    const currentAverageInput = document.getElementById('currentAverage').value;
-    const currentAverage = currentAverageInput ? parseFloat(currentAverageInput) : null;
+    const stepsDoneTodayInput = document.getElementById('stepsDoneToday').value;
+    const stepsDoneToday = stepsDoneTodayInput ? parseInt(stepsDoneTodayInput) : null;
+    const maxStepsRaw = localStorage.getItem('maxStepsPerDay');
+    const maxStepsPerDay = maxStepsRaw ? parseInt(maxStepsRaw) : null;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -72,9 +74,6 @@ function calculateTarget() {
     }
 
     const stepsRemaining = goalSteps - currentSteps;
-    const dailyStepsNeeded = stepsRemaining / daysRemaining;
-    const dailyKmNeeded = dailyStepsNeeded / stepsPerKm;
-    const dailyTimeNeeded = dailyKmNeeded / walkingSpeed;
 
     // Generate results HTML
     let resultsHTML = '';
@@ -89,25 +88,64 @@ function calculateTarget() {
             <button class="button" onclick="showForm()">Recalculate</button>
         `;
     } else {
-        const isAchievable = dailyStepsNeeded <= 25000; // Reasonable daily limit
-        const alertClass = isAchievable ? 'success' : 'warning';
-        const alertIcon = isAchievable ? '✅' : '⚠️';
+        // Achievability check
+        let achievable = true;
+        if (maxStepsPerDay !== null) {
+            const todayCapacity = maxStepsPerDay - (stepsDoneToday || 0);
+            const totalCapacity = Math.max(0, todayCapacity) + maxStepsPerDay * (daysRemaining - 1);
+            achievable = stepsRemaining <= totalCapacity;
+        }
 
-        // Check if daily target exceeds 2x the current average
-        let warningHTML = '';
-        if (currentAverage !== null && dailyStepsNeeded > 2 * currentAverage) {
-            warningHTML = `
+        // Calculate today-aware breakdown
+        let stepsToday = null;
+        let dailyStepsNeeded;
+
+        if (stepsDoneToday !== null) {
+            const fairShare = stepsRemaining / daysRemaining;
+            const cappedToday = maxStepsPerDay !== null ? Math.min(fairShare, maxStepsPerDay) : fairShare;
+            stepsToday = Math.max(0, Math.ceil(cappedToday - stepsDoneToday));
+
+            if (daysRemaining > 1) {
+                dailyStepsNeeded = (stepsRemaining - stepsToday) / (daysRemaining - 1);
+            } else {
+                dailyStepsNeeded = stepsToday;
+            }
+        } else {
+            dailyStepsNeeded = stepsRemaining / daysRemaining;
+        }
+
+        const dailyKmNeeded = dailyStepsNeeded / stepsPerKm;
+        const dailyTimeNeeded = dailyKmNeeded / walkingSpeed;
+
+        const statusHeader = achievable
+            ? '<div class="result-header" data-variant="success">✅ Achievable!</div>'
+            : '<div class="result-header" data-variant="warning">⚠️ Not achievable! This exceeds your max steps per day.</div>';
+
+        let stepsRows = '';
+        if (stepsToday !== null) {
+            stepsRows = `
                 <div class="result-row">
-                    <span class="result-label" style="color: var(--warning);">⚠️ This requires more than doubling your current average of ${Math.round(currentAverage).toLocaleString()} steps/day.</span>
-                </div>
-            `;
+                    <span class="result-label">Steps to go today</span>
+                    <span class="result-value">${stepsToday.toLocaleString()}</span>
+                </div>`;
+            if (daysRemaining > 1) {
+                stepsRows += `
+                <div class="result-row">
+                    <span class="result-label">Steps per day after today</span>
+                    <span class="result-value">${Math.ceil(dailyStepsNeeded).toLocaleString()}</span>
+                </div>`;
+            }
+        } else {
+            stepsRows = `
+                <div class="result-row">
+                    <span class="result-label">Daily steps needed</span>
+                    <span class="result-value">${Math.ceil(dailyStepsNeeded).toLocaleString()}</span>
+                </div>`;
         }
 
         resultsHTML = `
             <div class="result-card">
-                <div class="result-header" data-variant="${alertClass}">
-                    ${alertIcon} ${isAchievable ? 'Achievable!' : 'Challenging!'}
-                </div>
+                ${statusHeader}
                 <div class="result-row">
                     <span class="result-label">Steps remaining</span>
                     <span class="result-value">${Math.ceil(stepsRemaining).toLocaleString()}</span>
@@ -116,10 +154,7 @@ function calculateTarget() {
                     <span class="result-label">Days remaining</span>
                     <span class="result-value">${daysRemaining}</span>
                 </div>
-                <div class="result-row">
-                    <span class="result-label">Daily steps needed</span>
-                    <span class="result-value">${Math.ceil(dailyStepsNeeded).toLocaleString()}</span>
-                </div>
+                ${stepsRows}
                 <div class="result-row">
                     <span class="result-label">Daily distance</span>
                     <span class="result-value">${dailyKmNeeded.toFixed(1)} km</span>
@@ -128,7 +163,6 @@ function calculateTarget() {
                     <span class="result-label">Daily walking time</span>
                     <span class="result-value">${Math.floor(dailyTimeNeeded)}h ${Math.round((dailyTimeNeeded % 1) * 60)}min</span>
                 </div>
-                ${warningHTML}
             </div>
 
             <button class="button" onclick="showForm()">Recalculate</button>
